@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "mongoose": "^6.5.1",
+    "nodemon": "^2.0.19"
+  },
+  "name": "final-project---back-end",
+  "description": "Home Rental Web app - back end",
+  "version": "1.0.0",
+  "main": "App.js",
+  "scripts": {
+    "start": "nodemon App.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/melmi4455/Final-Project---Back-End.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/melmi4455/Final-Project---Back-End/issues"
+  },
+  "homepage": "https://github.com/melmi4455/Final-Project---Back-End#readme"
+}
