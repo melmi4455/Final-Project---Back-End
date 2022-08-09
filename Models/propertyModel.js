@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
 const propertySchema = mongoose.Schema({
-  Title: {
+  title: {
     type: String,
     required: true,
+  },
+  city:{
+    type:String,
+    required:true,
   },
   description: {
     type: String,
@@ -20,7 +24,7 @@ const propertySchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  Rooms: {
+  rooms: {
     type: Number,
     required: true,
   },
