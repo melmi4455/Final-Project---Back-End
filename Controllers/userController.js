@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 const express = require("express");
 const User = require("../Models/userModel");
 const bcrypt = require("bcrypt");
@@ -40,7 +40,7 @@ exports.signUp = async (req, res) => {
     res.status(400).json({ message: "signUp failed" });
   }
 };
-=======
+
 const User = require ("../Models/userModel")
 const bcrypt = require("bcrypt")
 
@@ -91,4 +91,4 @@ exports.login = async (req,res) => {
         res.status(400).json({message:"Error Login In"})
     }
 }
->>>>>>> 5e87344209f48a1cf3fe3110d06af52ca3aed598
+
