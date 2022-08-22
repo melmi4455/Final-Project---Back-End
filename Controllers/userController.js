@@ -9,14 +9,19 @@ exports.signUp = async (req, res) => {
     if (user) {
       return res.status(400).json({ messages: "this email is already taken" });
     }
+    //2 if the password is emty
+    if (req.body.password == "") {
+      return res.status(400).json({ messages: "password is required" });
+    }
 
-    //2. check if the password and confirmPassword is matched
+    //3. check if the password and confirmPassword is matched
     if (req.body.password !== req.body.confirmPassword) {
-      return res
-        .status(400)
-        .json({
-          messages: "your password and confirmPassword are not the same",
-        });
+      return res.status(400).json({
+        messages: "your password and confirmPassword are not the same",
+      });
+    }
+    if (req.body.confirmPassword == "") {
+      return res.status(400).json({ messages: "password is required" });
     }
     //3. check if password is less than 7 caracters
     if (req.body.password.length < 7) {
