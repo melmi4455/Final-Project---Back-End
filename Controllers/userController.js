@@ -1,94 +1,75 @@
-
 const express = require("express");
 const User = require("../Models/userModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
+// token function
+
+async function createToken(value) {
+  const token = await jwt.sign(
+    {
+      data: value,
+    },
+    "process.env.JWTSECRET",
+    { expiresIn: "1h" }
+  );
+  return token;
+}
 exports.signUp = async (req, res) => {
   try {
-    //1.check if the email is already registered
+    //1.check email if is it already taken
     const user = await User.findOne({ email: req.body.email });
     if (user) {
-      return res.status(400).json({ messages: "this email is already taken" });
-    }
-    //2 if the password is emty
-    if (req.body.password == "") {
-      return res.status(400).json({ messages: "password is required" });
+      return res.status(400).json({ messages: "email already exists" });
     }
 
-    //3. check if the password and confirmPassword is matched
+    //2. password === config.passwor
     if (req.body.password !== req.body.confirmPassword) {
-      return res.status(400).json({
-        messages: "your password and confirmPassword are not the same",
-      });
+      return res.status(400).json({ messages: "password does not match" });
     }
-    if (req.body.confirmPassword == "") {
-      return res.status(400).json({ messages: "password is required" });
-    }
-    //3. check if password is less than 7 caracters
+    //3. password.length >7
     if (req.body.password.length < 7) {
-      return res
-        .status(400)
-        .json({ messages: "password must be less than 7 characters" });
+      return res.status(400).json({ messages: "password too short" });
     }
     //4. encrypt password
     const hashpassword = await bcrypt.hash(req.body.password, 10);
     req.body.password = hashpassword;
+
+    //5 jsonwebtoken
+
     await User.create(req.body);
-    res.status(200).json({ message: " user created successfully" });
+
+    const token = await createToken({ email: req.body.email });
+    console.log(token);
+    res.status(200).json({ message: "created successfully", token });
+    console.log(token);
   } catch (e) {
     console.log(e.message);
-    res.status(400).json({ message: "signUp failed" });
+    res.status(400).json({ message: "signUp error try again" });
   }
 };
 
-const User = require ("../Models/userModel")
-const bcrypt = require("bcrypt")
-
-
-exports.signUp = async (req,res) => {
-    try{
-
-        // 1- Check if the Email exists
-        const user = await User.findOne({email:req.body.email})
-        console.log(req.body);
-        if(user) {
-            return res.status(400).json({message:"Email already exists"})
-        }
-
-        //    2-Encrypt Password
-        const encryptedPassword = await bcrypt.hash(req.body.password , 10);
-        req.body.password = encryptedPassword;
-
-        // 3.Create New User
-
-        await User.create(req.body);
-    res.status(200).json({message:"Sign Up Successful"})
-
-    } catch (e){
-        res.status(400).json({message:e.message});
+// Login part
+exports.Login = async (req, res) => {
+  try {
+    //1. check if email exists
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(404).json({ message: "Email or password incorrect" });
     }
-}
-
-exports.login = async (req,res) => {
-    try {
-        // 1. Check if Email exists in Database
-        const user = User.findOne(req.body.email) 
-        if (!user) {
-            res.status(400).json({message:"Email in correct"})
-        }
-
-        // 2. Check if Password is correct
-        const passwordCheck = await bcrypt.compare(req.body.password,user.password)
-        if(passwordCheck==false) {
-            res.status(400).json({message:"Password incorrect"});
-
-            // 3.Login Successful
-            res.status(200).json({message:"Login Successful"})
-        }
-
-    } 
-    catch(e){
-        res.status(400).json({message:"Error Login In"})
+    // 2. password correct
+    const password = await bcrypt.password(req.body.password, user.password);
+    if (!password) {
+      return res
+        .status(404)
+        .json({ message: "Passwords   or email incorrect" });
     }
-}
-
+    // 3. login success
+    const token = await createToken({ email: user.email });
+    console.log(token);
+    //
+    res.status(200).json({ message: "login Successful!", token });
+  } catch (e) {
+    res.status(404).json({ message: "login Error" });
+  }
+};
