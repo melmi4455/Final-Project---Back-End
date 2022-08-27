@@ -1,3 +1,4 @@
+
 const User = require ("../Models/userModel")
 const bcrypt = require("bcrypt");
 const jwt  = require("jsonwebtoken");
@@ -5,6 +6,12 @@ const jwt  = require("jsonwebtoken");
 
 
 
+
+const express = require("express");
+
+
+
+// token function
 
 
 exports.signUp = async (req,res) => {
@@ -139,9 +146,21 @@ exports.check = (req,res,next)=> {
             if(err) {
                 return res.status(400).json({message:"Session Expired"});
             }
+            req.user=decoded.data
         });
         res.status(200).json({message:"Correct User"})
     } catch(e){
         res.status(404).json({message:"error"});
     }
 }
+
+// async function createToken(value) {
+//   const token = await jwt.sign(
+//     {
+//       data: value,
+//     },
+//     "process.env.JWTSECRET",
+//     { expiresIn: "1h" }
+//   );
+//   return token;
+// };

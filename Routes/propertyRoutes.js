@@ -2,11 +2,23 @@ const express = require("express");
 const userController = require("../Controllers/userController")
 const propertyController = require("../Controllers/propertyController");
 const router = express.Router();
+const upload = require("../Utils/multer");
 
-router.route("/").post(userController.protect,propertyController.create).get(propertyController.getAll);
+
+router.route("/").post(upload.single("image"),propertyController.create).get(propertyController.getAll);
 router.route("/:id").get(propertyController.getOne).put(userController.protect,propertyController.edit).delete(userController.protect,propertyController.delete);
 
 
+// router
+//   .route("/")
+//   .get(propertyController.getAll)
+//   .post(upload.single("image"), propertyController.create);
 
+
+// router
+//   .route("/:id")
+//   .get(propertyController.getOne)
+//   .put(propertyController.edite)
+//   .delete(propertyController.delete);
 
 module.exports = router;

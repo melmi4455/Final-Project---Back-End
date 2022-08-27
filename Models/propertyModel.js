@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 const propertySchema = mongoose.Schema({
-  title: {
+  city: {
     type: String,
     required: true,
   },
-  city:{
-    type:String,
-    required:true,
+  district: {
+    type: String,
+    required: true,
   },
   description: {
     type: String,
@@ -32,11 +32,11 @@ const propertySchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  user: {
-    type: mongoose.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
+  // user: {
+  //   type: mongoose.Types.ObjectId,
+  //   ref: "User",
+  //   required: true,
+  // },
 });
 
 const propertyModel = mongoose.model("Property", propertySchema);
