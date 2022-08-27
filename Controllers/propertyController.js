@@ -2,8 +2,8 @@ const property = require("../Models/propertyModel");
 
 exports.getOne = async (req, res) => {
   try {
-    const property = await property.findById(req.params.id);
-    return res.status(200).json({ message: property });
+    const found = await property.findById(req.params.id);
+    return res.status(200).json({ message: found });
   } catch (e) {
     console.log(e.message);
     res.status(200).json({ message: "getOne" });
