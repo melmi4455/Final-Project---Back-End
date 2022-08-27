@@ -31,7 +31,7 @@ exports.create = async (req, res) => {
   }
 };
 // update existing property
-exports.edite = async (req, res) => {
+exports.edit = async (req, res) => {
   try {
     await property.findByIdAndUpdate(req.params.id, req.body);
     return res.status(200).json({ message: "update" });

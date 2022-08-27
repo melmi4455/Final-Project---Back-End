@@ -1,75 +1,166 @@
-const express = require("express");
-const User = require("../Models/userModel");
+
+const User = require ("../Models/userModel")
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const jwt  = require("jsonwebtoken");
+
+
+
+
+
+const express = require("express");
+
+
 
 // token function
 
-async function createToken(value) {
-  const token = await jwt.sign(
-    {
-      data: value,
-    },
-    "process.env.JWTSECRET",
-    { expiresIn: "1h" }
-  );
-  return token;
+
+exports.signUp = async (req,res) => {
+    try{
+
+        // 1- Check if the Email exists
+        const user = await User.findOne({email:req.body.email})
+        console.log(req.body);
+        if(user) {
+            return res.status(400).json({message:"Email already exists"})
+        }
+
+        //    2-Encrypt Password
+        const encryptedPassword = await bcrypt.hash(req.body.password , 10);
+        req.body.password = encryptedPassword;
+
+        // 3.Create New User
+
+        await User.create(req.body);
+
+        // 4. Token
+        const token = await jwt.sign(
+            {
+                expiresIn: "2h",
+                data:{email:req.body.email},
+            },
+            process.env.JWTSEC
+        );
+        // console.log(token)
+
+
+    res.status(200).json({message:"Sign Up Successful",token})
+
+    } catch (e){
+        res.status(400).json({message:e.message});
+    }
 }
-exports.signUp = async (req, res) => {
-  try {
-    //1.check email if is it already taken
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      return res.status(400).json({ messages: "email already exists" });
-    }
 
-    //2. password === config.passwor
-    if (req.body.password !== req.body.confirmPassword) {
-      return res.status(400).json({ messages: "password does not match" });
-    }
-    //3. password.length >7
-    if (req.body.password.length < 7) {
-      return res.status(400).json({ messages: "password too short" });
-    }
-    //4. encrypt password
-    const hashpassword = await bcrypt.hash(req.body.password, 10);
-    req.body.password = hashpassword;
+exports.login = async (req,res) => {
+    try {
+        // 1. Check if Email exists in Database
+        const user = await User.findOne({email:req.body.email}) 
+        if (!user) {
+            return res.status(400).json({message:"Email in correct"})
+        }
 
-    //5 jsonwebtoken
+        // 2. Check if Password is correct
+        const passwordCheck = await bcrypt.compare(req.body.password,user.password)
+        if(passwordCheck==false) {
+            return res.status(400).json({message:"Password incorrect"});
+        }
+            // 3.Token
+            
+            const token = await jwt.sign(
+                {
+                    expiresIn: "2h",
+                    data:{email:req.body.email},
+                },
+                process.env.JWTSEC
+            );
 
-    await User.create(req.body);
 
-    const token = await createToken({ email: req.body.email });
-    console.log(token);
-    res.status(200).json({ message: "created successfully", token });
-    console.log(token);
-  } catch (e) {
-    console.log(e.message);
-    res.status(400).json({ message: "signUp error try again" });
-  }
-};
+            // 4.Login Successful
+            res.status(200).json({message:"Login Successful",token})
+        
 
-// Login part
-exports.Login = async (req, res) => {
-  try {
-    //1. check if email exists
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(404).json({ message: "Email or password incorrect" });
+    } 
+    catch(e){
+        res.status(400).json({message:e.message});
+        // res.status(400).json({message:"Error Login In"})
+        
     }
-    // 2. password correct
-    const password = await bcrypt.password(req.body.password, user.password);
-    if (!password) {
-      return res
-        .status(404)
-        .json({ message: "Passwords   or email incorrect" });
+}
+
+exports.update = async (req,res) => {
+    // 1.Check if email exists
+    const user = await User.findOne({email:req.body.email})
+        if (!user) {
+            return res.status(400).json({message:"Email in correct"})
+        }
+    // // 2. Check if password is correct
+    const passwordCheck = await bcrypt.compare(req.body.oldPassword,user.password)
+        if(passwordCheck==false) {
+            return res.status(400).json({message:"Password incorrect"});
+        }
+
+    // // 3. Hash the Password
+    const encryptedPassword = await bcrypt.hash(req.body.newPassword , 10);
+        req.body.password = encryptedPassword; 
+        console.log(encryptedPassword)
+
+    // 4. Update
+    await User.findOneAndUpdate ( 
+        {email:user.email},
+        {password: encryptedPassword},
+        {name:req.body.name}
+    );
+
+    res.status(200).json({message:"Profile Updated"});
+}
+
+exports.protect = (req,res,next) => {
+    try{
+        const token = req.headers.authentication;
+        // 1.If token is empty
+        if(!token){
+            return res.status(400).message({message:"You are not logged in"})
+        }
+
+        // 2.Verify Token
+        jwt.verify(token,process.env.JWTSEC,function(err,decoded){
+            if(err){
+                return res.status(400).json({message:"Login session expired"});
+            }
+            req.user=decoded.data
+        });
+        next();
+
+    } catch(e){
+        return res.status(404).json({message:"error"});
     }
-    // 3. login success
-    const token = await createToken({ email: user.email });
-    console.log(token);
-    //
-    res.status(200).json({ message: "login Successful!", token });
-  } catch (e) {
-    res.status(404).json({ message: "login Error" });
-  }
-};
+}
+
+
+exports.check = (req,res,next)=> {
+    try{
+        const token = req.headers.authentication;
+        if(!token) {
+            return res.status(400).message({message:"You not logged in"});
+        }
+        jwt.verify(token,process.env.JWTSEC,function(err,decoded){
+            if(err) {
+                return res.status(400).json({message:"Session Expired"});
+            }
+            req.user=decoded.data
+        });
+        res.status(200).json({message:"Correct User"})
+    } catch(e){
+        res.status(404).json({message:"error"});
+    }
+}
+
+// async function createToken(value) {
+//   const token = await jwt.sign(
+//     {
+//       data: value,
+//     },
+//     "process.env.JWTSECRET",
+//     { expiresIn: "1h" }
+//   );
+//   return token;
+// };
