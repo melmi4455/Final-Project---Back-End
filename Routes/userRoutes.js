@@ -4,8 +4,8 @@ const router = express.Router();
 
 router.route("/signUp").post(userController.signUp);
 
-router.route("/").post(userController.signUp);
-router.route("/").post(userController.logIn);
+
+router.route("/login").post(userController.logIn);
 
 // router
 // .route("/updateprofile")

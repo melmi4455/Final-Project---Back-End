@@ -17,11 +17,7 @@ exports.signUp = async (req, res) => {
     const encryptedPassword = await bcrypt.hash(req.body.password, 10);
     req.body.password = encryptedPassword;
 
-    // 3.Create New User
-
-    await User.create(req.body);
-
-    // 4. Token
+    // 3. Token
     const token = await jwt.sign(
       {
         expiresIn: "2h",
@@ -29,7 +25,9 @@ exports.signUp = async (req, res) => {
       },
       process.env.JWTSEC
     );
-    // console.log(token);
+    // 4.Create New User
+
+    await User.create(req.body);
 
     res.status(200).json({ message: "Sign Up Successful", token });
   } catch (e) {
@@ -46,7 +44,7 @@ exports.logIn = async (req, res) => {
       return res.status(404).json({ message: "Email or password incorrect" });
     }
     // 2. password correct
-    const password = await bcrypt.password(req.body.password, user.password);
+    const password = await bcrypt.compare(req.body.password, user.password);
     if (password === false) {
       return res
         .status(404)
@@ -63,7 +61,8 @@ exports.logIn = async (req, res) => {
     );
     res.status(200).json({ message: "login Successful!", token });
   } catch (e) {
-    res.status(404).json({ message: "logIn error" });
+    res.status(404).json({ message: "logn error" });
+    console.log(e)
   }
 };
 
