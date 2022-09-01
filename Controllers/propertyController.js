@@ -31,6 +31,7 @@ exports.create = async (req, res) => {
     );
     req.body.image = req.file.filename;
     req.body.user = req.user.id;
+
     await property.create(req.body);
     // console.log(req.body);
     res.status(200).json({ message: "created successfully", token });

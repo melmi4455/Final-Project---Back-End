@@ -17,5 +17,5 @@ app.use("/property", propertyRoutes);
 const port = 7000;
 
 app.listen(port, () => {
-  console.log("connection is working");
+  console.log("connected");
 });
