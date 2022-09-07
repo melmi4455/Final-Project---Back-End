@@ -6,7 +6,7 @@ const router = express.Router();
 const upload = require("../Utils/multer");
 
 router.route("/usersHouses").get(userController.protect,propertyController.usersHouses);
-router.route("/filter").get(propertyController.filter);
+router.route("/filter/:city").get(propertyController.filter);
 
 // router
 //   .route("/")

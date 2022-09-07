@@ -21,7 +21,7 @@ exports.signUp = async (req, res) => {
     const token = await jwt.sign(
       {
         expiresIn: "2h",
-        data: { email: req.body.email},
+        data: { id:user.id, email: req.body.email},
       },
       process.env.JWTSEC
     );
@@ -68,6 +68,7 @@ exports.logIn = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+  try{
   // 1.Check if email exists
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -91,11 +92,13 @@ exports.update = async (req, res) => {
   await User.findOneAndUpdate(
     { email: user.email },
     { password: encryptedPassword },
-    { name: req.body.name }
   );
 
   res.status(200).json({ message: "Profile Updated" });
-};
+} catch(e){
+  console.log(e.message)
+}
+} 
 
 exports.protect = (req, res, next) => {
   try {

@@ -77,13 +77,14 @@ exports.usersHouses = async (req, res) => {
 
 exports.filter = async (req, res) => {
   try {
-    const filtered= await property.find({})
+    const filtered= await property.find({city:req.params.city})
+    console.log(req.body)
     
     return res.status(200).json({ message: "found" , filtered});
     
         
   } catch (e) {
-    console.log(e.message);
+    console.log(e);
     res.status(200).json({ message: "deleted error" }); 
   }
  
