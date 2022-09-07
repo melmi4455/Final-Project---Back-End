@@ -5,6 +5,9 @@ const propertyController = require("../Controllers/propertyController");
 const router = express.Router();
 const upload = require("../Utils/multer");
 
+router.route("/usersHouses").get(userController.protect,propertyController.usersHouses);
+router.route("/filter").get(propertyController.filter);
+
 // router
 //   .route("/")
 //   .post(upload.single("image"), propertyController.create)
@@ -27,7 +30,7 @@ router
 router
   .route("/:id")
   .get(propertyController.getOne)
-  // .put(propertyController.edite)
+  .put(upload.single("image"),propertyController.edit)
   .delete(propertyController.delete);
 
 module.exports = router;

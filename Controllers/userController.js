@@ -21,7 +21,7 @@ exports.signUp = async (req, res) => {
     const token = await jwt.sign(
       {
         expiresIn: "2h",
-        data: { email: req.body.email },
+        data: { email: req.body.email},
       },
       process.env.JWTSEC
     );
@@ -32,6 +32,7 @@ exports.signUp = async (req, res) => {
     res.status(200).json({ message: "Sign Up Successful", token });
   } catch (e) {
     res.status(400).json({ message: e.message });
+    console.log(e)
   }
 };
 
@@ -107,12 +108,13 @@ exports.protect = (req, res, next) => {
 
     // 2.Verify Token
     jwt.verify(token, process.env.JWTSEC, function (err, decoded) {
-      console.log(decoded.data);
+      // console.log(decoded);
       if (err) {
         return res.status(400).json({ message: "Login session expired" });
       }
 
       req.user = decoded.data;
+      // console.log(req.user)
     });
     next();
   } catch (e) {
