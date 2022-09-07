@@ -4,7 +4,6 @@ const router = express.Router();
 
 router.route("/signUp").post(userController.signUp);
 
-
 router.route("/login").post(userController.logIn);
 
 // router

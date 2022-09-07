@@ -3,7 +3,8 @@ const jwt = require("jsonwebtoken");
 
 exports.getOne = async (req, res) => {
   try {
-    const found = await property.findById({});
+    const found = await property.findOneById();
+
     return res.status(200).json({ message: found });
   } catch (e) {
     console.log(e.message);

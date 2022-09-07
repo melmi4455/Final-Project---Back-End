@@ -25,7 +25,7 @@ router
   );
 
 router
-  .route("/:id")
+  .route("/:")
   .get(propertyController.getOne)
   // .put(propertyController.edite)
   .delete(propertyController.delete);

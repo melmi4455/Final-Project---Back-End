@@ -8,8 +8,9 @@ exports.signUp = async (req, res) => {
   try {
     // 1- Check if the Email exists
     const user = await User.findOne({ email: req.body.email });
-    console.log(req.body);
+
     if (user) {
+      console.log(user);
       return res.status(400).json({ message: "Email already exists" });
     }
 
@@ -55,14 +56,14 @@ exports.logIn = async (req, res) => {
     const token = await jwt.sign(
       {
         expiresIn: "2h",
-        data: { id: user.id, email: user.email },
+        data: { id: user._id, email: user.email },
       },
       process.env.JWTSEC
     );
     res.status(200).json({ message: "login Successful!", token });
   } catch (e) {
     res.status(404).json({ message: "logn error" });
-    console.log(e)
+    console.log(e);
   }
 };
 
@@ -107,7 +108,6 @@ exports.protect = (req, res, next) => {
 
     // 2.Verify Token
     jwt.verify(token, process.env.JWTSEC, function (err, decoded) {
-      console.log(decoded.data);
       if (err) {
         return res.status(400).json({ message: "Login session expired" });
       }
