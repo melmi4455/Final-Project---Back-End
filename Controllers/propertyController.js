@@ -57,7 +57,7 @@ exports.delete = async (req, res) => {
     await property.findByIdAndDelete(req.params.id);
     return res.status(200).json({ message: "deleted" });
   } catch (e) {
-    console.log(e.message);
+    // console.log(e.message);
     res.status(200).json({ message: "deleted error" });
   }
 };
